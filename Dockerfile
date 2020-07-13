@@ -1,4 +1,5 @@
 # https://hub.docker.com/_/node/
+# Copy a image of a base install of Node_js with user setup.
 FROM node:8-onbuild
 
 # use debug to troubleshoot
@@ -15,6 +16,7 @@ ENV PATH=$PATH:/home/node/.npm-global/bin
 
 # Lets install our app into /home/node
 COPY . /home/node/probot-hello
+# Change ownership. Don't run with high eleveted permissions to see security issues
 RUN chown -R node:node /home/node/probot-hello
 
 # setup our app
