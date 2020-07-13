@@ -1,0 +1,10 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker pull node:8-onbuild #docker Base image with Node.js
+  - docker build -t probot-hello . # Dot references the current working dir
+
+script:
+  - docker run --rm probot-hello npm run test # run tests. Note option -it was removed, because in Travis there's no iterative shell
