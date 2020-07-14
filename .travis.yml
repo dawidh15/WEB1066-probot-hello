@@ -15,7 +15,7 @@ script:
   - docker build -t node:$NODE_VERSION --build-arg NODE_IMAGE="node:${NODE_VERSION}" .
   - docker images
   - docker tag node:$NODE_VERSION $DOCKER_USERNAME/probot-hello:$NODE_VERSION-$(git rev-parse HEAD) # We had to create this repo manually in hub.docker first (dawidh15/probot-hello)
-  - docker push node:$NODE_VERSION $DOCKER_USERNAME/probot-hello:$NODE_VERSION-$(git rev-parse HEAD) #publish image
+  - docker push $DOCKER_USERNAME/probot-hello:$NODE_VERSION-$(git rev-parse HEAD) #publish image
   - docker run --rm probot-hello npm run $NPM_TARGET # Will be substituted by the env values of the variable.
 
 # Stage treats everything under script as an action called "test"
