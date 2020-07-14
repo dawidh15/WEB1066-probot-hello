@@ -2,6 +2,13 @@ sudo: required
 services:
   - docker
 
+# Crear variables de entorno.
+# If we defined a single environment variable name with different values, we can run them in paralel afterwards.
+env:
+  - NPM_TARGET=test
+  - NPM_TARGET=lint
+  - NPM_TARGET=coverage
+
 before_install:
   - docker pull node:8-onbuild #docker Base image with Node.js
 
@@ -10,9 +17,16 @@ install:
   # -t is for 'tag', which means that our image will be called 'probot-hello'
 
 script:
-  - docker run --rm probot-hello npm run test # run tests. Note option -it was removed, because in Travis there's no iterative shell
-  - docker run --rm probot-hello npm run lint # lint is a Node_js command to check for syntax errors in code.
+  - docker run --rm probot-hello npm run $NPM_TARGET # Will be substituted by the env values of the variable.
 
-#after_success is use to run scripts only if the build was successful. We'll create a docker image with a tag that represents the name of the image plus the commit ID of the changes.
+#after_success is use to run scripts only if the build was successful. We'll create a docker image with a tag that represents the name of the image plus the commit ID of the changes. This will be created only if $NPM_TARGET is equal to 'test'
 after_success:
-  - docker tag probot-hello probot-hello:$(git rev-parse HEAD)
+  - set -x -v;  #This can expose secrets, use with care!
+    set -e; # For errors
+    if ["${NPM_TARGET}" = "test"]; then
+      docker tag probot-hello probot-hello:$(git rev-parse HEAD);
+    else
+      echo "skipping docker tag";
+    fi;
+    docker images; #To see the tag
+    set +x +v;
