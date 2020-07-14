@@ -29,7 +29,7 @@ jobs:
       name: "Test 8-jessie"
       install: skip
       script:
-      - docker run --rm node:$NODE_VERSION $DOCKER_USERNAME/probot-hello:$NODE_VERSION-$(git rev-parse HEAD) npm run $NPM_TARGET #This runs the image we've created under script above "stage" tag
+      - docker run --rm $DOCKER_USERNAME/probot-hello:$NODE_VERSION-$(git rev-parse HEAD) npm run $NPM_TARGET #This runs the image we've created under script above "stage" tag
       env:
       - NODE_VERSION=8-jessie
       - NPM_TARGET=test
@@ -37,7 +37,7 @@ jobs:
       name: "Lint 8-jessie"
       install: skip
       script:
-      - docker run --rm node:$NODE_VERSION $DOCKER_USERNAME/probot-hello:$NODE_VERSION-$(git rev-parse HEAD) npm run $NPM_TARGET #This runs the image we've created under script above "stage" tag
+      - docker run --rm $DOCKER_USERNAME/probot-hello:$NODE_VERSION-$(git rev-parse HEAD) npm run $NPM_TARGET #This runs the image we've created under script above "stage" tag
       env:
       - NODE_VERSION=8-jessie
       - NPM_TARGET=lint
@@ -45,7 +45,7 @@ jobs:
         name: "Test 10-jessie"
         install: skip
         script:
-        - docker run --rm node:$NODE_VERSION $DOCKER_USERNAME/probot-hello:$NODE_VERSION-$(git rev-parse HEAD) npm run $NPM_TARGET #This runs the image we've created under script above "stage" tag
+        - docker run --rm $DOCKER_USERNAME/probot-hello:$NODE_VERSION-$(git rev-parse HEAD) npm run $NPM_TARGET #This runs the image we've created under script above "stage" tag
         env:
         - NODE_VERSION=10-jessie
         - NPM_TARGET=test
@@ -53,7 +53,7 @@ jobs:
         name: "Lint 10-jessie"
         install: skip
         script:
-        - docker run --rm node:$NODE_VERSION $DOCKER_USERNAME/probot-hello:$NODE_VERSION-$(git rev-parse HEAD) npm run $NPM_TARGET #This runs the image we've created under script above "stage" tag
+        - docker run --rm $DOCKER_USERNAME/probot-hello:$NODE_VERSION-$(git rev-parse HEAD) npm run $NPM_TARGET #This runs the image we've created under script above "stage" tag
         if: branch = master
         env:
         - NODE_VERSION=10-jessie
