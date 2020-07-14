@@ -12,3 +12,7 @@ install:
 script:
   - docker run --rm probot-hello npm run test # run tests. Note option -it was removed, because in Travis there's no iterative shell
   - docker run --rm probot-hello npm run lint # lint is a Node_js command to check for syntax errors in code.
+
+#after_success is use to run scripts only if the build was successful. We'll create a docker image with a tag that represents the name of the image plus the commit ID of the changes.
+after_success:
+  - docker tag probot-hello probot-hello:$(git rev-parse HEAD)
