@@ -1,6 +1,8 @@
 # https://hub.docker.com/_/node/
 # Copy a image of a base install of Node_js with user setup.
-FROM node:8-onbuild
+#Module 2 Example 4: We are passing the node build image as a variable value.
+ARG NODE_IMAGE=node:8-onbuild
+FROM $NODE_IMAGE
 
 # use debug to troubleshoot
 ENV LOG_LEVEL=error

@@ -2,32 +2,59 @@ sudo: required
 services:
   - docker
 
-# Crear variables de entorno.
-# If we defined a single environment variable name with different values, we can run them in paralel afterwards.
+## Create Environment Variables.
+## If we defined a single environment variable name with different values, we can run them in paralel afterwards.
+## The value of the NODE_VERSION comes from hub.docker.com, in the offcial node image repo.
 env:
-  - NPM_TARGET=test
-  - NPM_TARGET=lint
-  - NPM_TARGET=coverage
+  - NODE_VERSION=8-jessie
+  - NODE_VERSION=10-jessie
 
-before_install:
-  - docker pull node:8-onbuild #docker Base image with Node.js
-
-install:
-  - docker build -t probot-hello . # Dot references the current working dir
-  # -t is for 'tag', which means that our image will be called 'probot-hello'
-
+# # We are now building the DOCKER IMAGE on the script Phase
 script:
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  - docker build -t node:$NODE_VERSION --build-arg NODE_IMAGE="node:${NODE_VERSION}" .
+  - docker images
+  - docker tag node:$NODE_VERSION $DOCKER_USERNAME/probot-hello:$NODE_VERSION-$(git rev-parse HEAD) # We had to create this repo manually in hub.docker first (dawidh15/probot-hello)
+  - docker push node:$NODE_VERSION $DOCKER_USERNAME/probot-hello:$NODE_VERSION-$(git rev-parse HEAD) #publish image
   - docker run --rm probot-hello npm run $NPM_TARGET # Will be substituted by the env values of the variable.
 
-#after_success is use to run scripts only if the build was successful. We'll create a docker image with a tag that represents the name of the image plus the commit ID of the changes. This will be created only if $NPM_TARGET is equal to 'test'
-# set -x -v; can expose secrets!
-after_success:
-  - set -x -v;
-    set -e;
-    if [ "${NPM_TARGET}" = "test" ]; then
-      docker tag probot-hello probot-hello:$(git rev-parse HEAD);
-    else
-      echo "skipping docker tag";
-    fi;
-    docker images;
-    set +x +v;
+# Stage treats everything under script as an action called "test"
+stage:
+  - test
+  - npm-targets
+
+jobs:
+  include:
+    - stage: npm-targets
+      name: "Test 8-jessie"
+      install: skip
+      script:
+      - docker run --rm node:$NODE_VERSION $DOCKER_USERNAME/probot-hello:$NODE_VERSION-$(git rev-parse HEAD) npm run $NPM_TARGET #This runs the image we've created under script above "stage" tag
+      env:
+      - NODE_VERSION=8-jessie
+      - NPM_TARGET=test
+    - stage: npm-targets
+      name: "Lint 8-jessie"
+      install: skip
+      script:
+      - docker run --rm node:$NODE_VERSION $DOCKER_USERNAME/probot-hello:$NODE_VERSION-$(git rev-parse HEAD) npm run $NPM_TARGET #This runs the image we've created under script above "stage" tag
+      env:
+      - NODE_VERSION=8-jessie
+      - NPM_TARGET=lint
+      - stage: npm-targets
+        name: "Test 10-jessie"
+        install: skip
+        script:
+        - docker run --rm node:$NODE_VERSION $DOCKER_USERNAME/probot-hello:$NODE_VERSION-$(git rev-parse HEAD) npm run $NPM_TARGET #This runs the image we've created under script above "stage" tag
+        env:
+        - NODE_VERSION=10-jessie
+        - NPM_TARGET=test
+      - stage: npm-targets
+        name: "Lint 10-jessie"
+        install: skip
+        script:
+        - docker run --rm node:$NODE_VERSION $DOCKER_USERNAME/probot-hello:$NODE_VERSION-$(git rev-parse HEAD) npm run $NPM_TARGET #This runs the image we've created under script above "stage" tag
+        if: branch = master
+        env:
+        - NODE_VERSION=10-jessie
+        - NPM_TARGET=lint
