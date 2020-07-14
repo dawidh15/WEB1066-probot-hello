@@ -4,7 +4,11 @@ services:
 
 before_install:
   - docker pull node:8-onbuild #docker Base image with Node.js
+
+install:
   - docker build -t probot-hello . # Dot references the current working dir
+  # -t is for 'tag', which means that our image will be called 'probot-hello'
 
 script:
   - docker run --rm probot-hello npm run test # run tests. Note option -it was removed, because in Travis there's no iterative shell
+- docker run --rm probot-hello npm run lint # lint is a Node_js command to check for syntax errors in code.
