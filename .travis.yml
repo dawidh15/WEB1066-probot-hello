@@ -20,13 +20,14 @@ script:
   - docker run --rm probot-hello npm run $NPM_TARGET # Will be substituted by the env values of the variable.
 
 #after_success is use to run scripts only if the build was successful. We'll create a docker image with a tag that represents the name of the image plus the commit ID of the changes. This will be created only if $NPM_TARGET is equal to 'test'
+# set -x -v; can expose secrets!
 after_success:
-  - set -x -v;  #This can expose secrets, use with care!
-    set -e; # For errors
-    if ["${NPM_TARGET}" = "test"]; then
+  - set -x -v;
+    set -e;
+    if [ "${NPM_TARGET}" = "test" ]; then
       docker tag probot-hello probot-hello:$(git rev-parse HEAD);
     else
       echo "skipping docker tag";
     fi;
-    docker images; #To see the tag
+    docker images;
     set +x +v;
